@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<schema name="ExpenseMate" JadeVersionNumber="18.0.01" JadePatchNumber="0" CompleteDefinition="true">
+
+	<Application name="ExpenseMate">
+		<__overridePatchNumber>0</__overridePatchNumber>
+		<__patchControlString/>
+		<_aboutFormName/>
+		<_defaultLocaleId>0</_defaultLocaleId>
+		<_modifiedBy>mjhylkema</_modifiedBy>
+		<_modifiedTimestamp>2020:09:28:21:15:10.314</_modifiedTimestamp>
+		<_patchVersion>0</_patchVersion>
+		<_startupFormName/>
+		<_systemVersion>18.0.01</_systemVersion>
+		<aboutForm/>
+		<appVersion/>
+		<applicationType>G</applicationType>
+		<controlSpacing>0</controlSpacing>
+		<defaultApp>true</defaultApp>
+		<defaultMdi>false</defaultMdi>
+		<finalizeMethod/>
+		<fontBold>false</fontBold>
+		<fontName>Tahoma</fontName>
+		<fontSize>8.25</fontSize>
+		<formMargin>0</formMargin>
+		<heightSingleLineControl>0</heightSingleLineControl>
+		<helpFile/>
+		<icon/>
+		<initializeMethod/>
+		<mousePointer>0</mousePointer>
+		<name>ExpenseMate</name>
+		<showBubbleHelp>false</showBubbleHelp>
+		<startupForm/>
+		<useBorderStyleOnly>false</useBorderStyleOnly>
+		<userSecurityLevel>0</userSecurityLevel>
+		<webMinimumResponseTime>0</webMinimumResponseTime>
+		<threeDControls>
+			<GUIClass name="GroupBox" />
+			<GUIClass name="OptionButton" />
+			<GUIClass name="CheckBox" />
+		</threeDControls>
+	</Application>
+
+	<Global name="GExpenseMate">
+	</Global>
+</schema>
