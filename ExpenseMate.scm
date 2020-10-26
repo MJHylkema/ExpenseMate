@@ -7,6 +7,8 @@ constantDefinitions
 localeDefinitions
 	2057 "English (United Kingdom)" schemaDefaultLocale;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.294;
+	5129 "English (New Zealand)" _cloneOf 2057;
+		setModifiedTimeStamp "<unknown>" "" 2020:10:24:00:42:45;
 libraryDefinitions
 typeHeaders
 	ExpenseMate subclassOf RootSchemaApp transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2048;
@@ -19,11 +21,30 @@ typeHeaders
 	Transaction subclassOf Data number = 2062;
 	User subclassOf Data number = 2053;
 	GExpenseMate subclassOf RootSchemaGlobal transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2049;
+	TemporalAdjuster subclassOf Object abstract, number = 2055;
+	RepeatingOccurrenceAdjuster subclassOf TemporalAdjuster highestOrdinal = 3, number = 2056;
 	SExpenseMate subclassOf RootSchemaSession transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2050;
 	EventSet subclassOf ObjectSet loadFactor = 66, number = 2063;
 	ExpenseSet subclassOf EventSet loadFactor = 66, number = 2065;
  
 interfaceDefs
+	TemporalAdjusterIF number = 1280
+	(
+	documentationText
+`Have a TemporalAdjuster class for each type of adjustment
+
+e.g. 
+
+ - Next DayOfWeek Occurrence
+ - Next day in month occurrence`
+
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:11:48.607;
+ 
+	jadeMethodDefinitions
+		adjustInto(date: Date): Date number = 1001;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:24:00:59:46.543;
+	)
+ 
 membershipDefinitions
 	EventSet of Event ;
 	ExpenseSet of ReoccurringExpense ;
@@ -171,6 +192,55 @@ typeDefinitions
 		monthyDepositExample() number = 1001;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:44:47.868;
 	)
+	TemporalAdjuster completeDefinition
+	(
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:29:25.194;
+ 
+	jadeMethodDefinitions
+		adjustInto(date: Date): Date abstract, number = 1001;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:29:33.261;
+	implementInterfaces
+		TemporalAdjusterIF
+		(
+		adjustInto is adjustInto;
+		)
+	)
+	RepeatingOccurrenceAdjuster completeDefinition
+	(
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:17:33:43.901;
+	constantDefinitions
+		Daily:                         Integer = 0 number = 1001;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:49:41.341;
+		Monthly:                       Integer = 2 number = 1003;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:49:55.312;
+		Weekly:                        Integer = 1 number = 1002;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:49:47.239;
+		Yearly:                        Integer = 3 number = 1004;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:50:05.405;
+	attributeDefinitions
+		period:                        Integer protected, number = 1, ordinal = 1;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:31:12.711;
+		startDate:                     Date protected, number = 3, ordinal = 3;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:54:24.918;
+		unit:                          Integer protected, number = 2, ordinal = 2;
+	documentationText
+`Based on RepeatingOccurrenceAdjuster constants
+ - Daily
+ - Weekly
+ - Monthly
+ - Yearly`
+
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:59:21.057;
+ 
+	jadeMethodDefinitions
+		adjustInto(date: Date): Date number = 1001;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:17:34:28.250;
+		create(
+			startDate: Date; 
+			unit: Integer; 
+			period: Integer) updating, number = 1002;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:22:58:18.021;
+	)
 	WebSession completeDefinition
 	(
 	)
@@ -210,7 +280,9 @@ typeDefinitions
 			day: Integer; 
 			month: Integer; 
 			year: Integer): Date typeMethod, number = 1001;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:26:25.723;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:22:50:08.408;
+		with(adjuster: TemporalAdjusterIF): Date number = 1002;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:13:03.143;
 	)
  
  
@@ -238,6 +310,8 @@ ExpenseMateDb
 		EventOccurrence in "expensemate";
 		EventSet in "expensemate";
 		ExpenseSet in "expensemate";
+		TemporalAdjuster in "expensemate";
+		RepeatingOccurrenceAdjuster in "expensemate";
 	)
 schemaViewDefinitions
 exportedPackageDefinitions
@@ -503,6 +577,82 @@ end;
 }
 
 	)
+	TemporalAdjuster (
+	jadeMethodSources
+adjustInto
+{
+adjustInto(date : Date) : Date abstract;
+
+}
+
+	)
+	RepeatingOccurrenceAdjuster (
+	jadeMethodSources
+adjustInto
+{
+adjustInto(date: Date): Date;
+
+vars
+	adjustedDate	: Date;
+	startModulus	: Integer;
+	adjustedModulus	: Integer;
+begin
+	if self.unit = Daily then
+	
+		adjustedDate := date + 1;
+	
+	elseif self.unit = Weekly then
+	
+		startModulus := self.startDate.Integer mod 7;  								// 143 mod 7 = 3
+		adjustedModulus := date.Integer mod 7;										// 145 mod 7 = 5
+		adjustedDate := (date.Integer + 7 - adjustedModulus + startModulus).Date;	// 150 = 145 + 7 - 5 + 3
+		
+	elseif self.unit = Monthly then
+	
+		if date.day <= self.startDate.day then
+			adjustedDate.setDate(self.startDate.day, date.month, date.year);
+		else
+			if date.month = 12 then
+				adjustedDate.setDate(self.startDate.day, 1, date.year + 1);
+			else
+				adjustedDate.setDate(self.startDate.day, date.month + 1, date.year);
+			endif;
+		endif;
+	
+	elseif self.unit = Yearly then
+	
+		if date.month < self.startDate.month then
+			adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year);
+		elseif date.month = self.startDate.month then
+			if date.day < self.startDate.day then
+				adjustedDate.setDate(self.startDate.day, date.month, date.year);
+			else
+				adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + 1);
+			endif;
+		else
+			adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + 1);
+		endif;
+	
+	endif;
+	
+	return adjustedDate;
+end;
+
+}
+
+create
+{
+create(startDate: Date; unit, period: Integer) updating;
+
+begin
+	self.startDate := startDate;
+	self.unit := unit;
+	self.period := period;
+end;
+
+}
+
+	)
 	Date (
 	jadeMethodSources
 createDate
@@ -516,6 +666,24 @@ begin
 	return date;
 end;
 
+}
+
+with
+{
+with(adjuster: TemporalAdjusterIF): Date;
+
+begin
+	return adjuster.adjustInto(self);
+end;
+
+}
+
+	)
+	TemporalAdjusterIF (
+	jadeMethodSources
+adjustInto
+{
+adjustInto(date: Date): Date;
 }
 
 	)
