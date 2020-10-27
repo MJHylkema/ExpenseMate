@@ -8,7 +8,7 @@ localeDefinitions
 	2057 "English (United Kingdom)" schemaDefaultLocale;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.294;
 	5129 "English (New Zealand)" _cloneOf 2057;
-		setModifiedTimeStamp "<unknown>" "" 2020:10:24:00:42:45;
+		setModifiedTimeStamp "<unknown>" "" 2020:10:27:20:41:13;
 libraryDefinitions
 typeHeaders
 	ExpenseMate subclassOf RootSchemaApp transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2048;
@@ -21,14 +21,14 @@ typeHeaders
 	Transaction subclassOf Data number = 2062;
 	User subclassOf Data number = 2053;
 	GExpenseMate subclassOf RootSchemaGlobal transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2049;
-	TemporalAdjuster subclassOf Object abstract, number = 2055;
-	RepeatingOccurrenceAdjuster subclassOf TemporalAdjuster highestOrdinal = 3, number = 2056;
-	SExpenseMate subclassOf RootSchemaSession transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2050;
-	EventSet subclassOf ObjectSet loadFactor = 66, number = 2063;
-	ExpenseSet subclassOf EventSet loadFactor = 66, number = 2065;
+	TemporalAdjuster subclassOf Object abstract, number = 2050;
+	RepeatingOccurrenceAdjuster subclassOf TemporalAdjuster highestOrdinal = 3, number = 2063;
+	SExpenseMate subclassOf RootSchemaSession transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2065;
+	EventSet subclassOf ObjectSet loadFactor = 66, number = 2067;
+	ExpenseSet subclassOf EventSet loadFactor = 66, number = 2069;
  
 interfaceDefs
-	TemporalAdjusterIF number = 1280
+	TemporalAdjusterIF number = 1281
 	(
 	documentationText
 `Have a TemporalAdjuster class for each type of adjustment
@@ -192,6 +192,10 @@ typeDefinitions
 		monthyDepositExample() number = 1001;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:44:47.868;
 	)
+	JadeTestCase completeDefinition
+	(
+		setModifiedTimeStamp "cnwnhs1" "99.0.00" 31016 2017:08:01:15:34:51.891;
+	)
 	TemporalAdjuster completeDefinition
 	(
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:29:25.194;
@@ -207,7 +211,7 @@ typeDefinitions
 	)
 	RepeatingOccurrenceAdjuster completeDefinition
 	(
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:17:33:43.901;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:21:06:38.152;
 	constantDefinitions
 		Daily:                         Integer = 0 number = 1001;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:49:41.341;
@@ -234,12 +238,20 @@ typeDefinitions
  
 	jadeMethodDefinitions
 		adjustInto(date: Date): Date number = 1001;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:17:34:28.250;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:00:52.074;
 		create(
 			startDate: Date; 
 			unit: Integer; 
 			period: Integer) updating, number = 1002;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:22:58:18.021;
+		nextDailyValue(date: Date): Date number = 1005;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:37:00.013;
+		nextMonthlyValue(date: Date): Date number = 1003;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:23:51:29.907;
+		nextWeeklyValue(date: Date): Date number = 1004;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:32:48.750;
+		nextYearlyValue(date: Date): Date number = 1006;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:21:57:57.013;
 	)
 	WebSession completeDefinition
 	(
@@ -597,45 +609,30 @@ vars
 	startModulus	: Integer;
 	adjustedModulus	: Integer;
 begin
+	
+	if date < self.startDate then
+		return self.startDate;
+	endif;
+
 	if self.unit = Daily then
 	
-		adjustedDate := date + 1;
+		return nextDailyValue(date);
 	
 	elseif self.unit = Weekly then
 	
-		startModulus := self.startDate.Integer mod 7;  								// 143 mod 7 = 3
-		adjustedModulus := date.Integer mod 7;										// 145 mod 7 = 5
-		adjustedDate := (date.Integer + 7 - adjustedModulus + startModulus).Date;	// 150 = 145 + 7 - 5 + 3
+		return nextWeeklyValue(date);
 		
 	elseif self.unit = Monthly then
 	
-		if date.day <= self.startDate.day then
-			adjustedDate.setDate(self.startDate.day, date.month, date.year);
-		else
-			if date.month = 12 then
-				adjustedDate.setDate(self.startDate.day, 1, date.year + 1);
-			else
-				adjustedDate.setDate(self.startDate.day, date.month + 1, date.year);
-			endif;
-		endif;
+		return nextMonthlyValue(date);
 	
 	elseif self.unit = Yearly then
 	
-		if date.month < self.startDate.month then
-			adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year);
-		elseif date.month = self.startDate.month then
-			if date.day < self.startDate.day then
-				adjustedDate.setDate(self.startDate.day, date.month, date.year);
-			else
-				adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + 1);
-			endif;
-		else
-			adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + 1);
-		endif;
+		return nextYearlyValue(date);
 	
 	endif;
 	
-	return adjustedDate;
+	return null;
 end;
 
 }
@@ -648,6 +645,119 @@ begin
 	self.startDate := startDate;
 	self.unit := unit;
 	self.period := period;
+end;
+
+}
+
+nextDailyValue
+{
+nextDailyValue(date: Date): Date;
+
+vars
+	totalDays		: Integer;
+	modulus			: Integer;
+	diff			: Integer;
+	adjustedDate	: Date;
+begin
+
+	totalDays := date.Integer - self.startDate.Integer;
+	modulus := totalDays mod self.period;
+	diff := self.period - modulus;
+	adjustedDate := (date.Integer + diff).Date;
+	
+	return adjustedDate;
+end;
+
+
+}
+
+nextMonthlyValue
+{
+nextMonthlyValue(date: Date): Date;
+
+	// Example
+	// Period		: 5 Months
+	// StartDate 	: 9 October 1994
+	// Date			: 5 March 1998
+	// TotalMonths 	: ((1998 - 1994) * 12) + (3 - 10) = 48 - 7 = 41 
+
+vars
+	totalMonths		: Integer;
+	modulus			: Integer;
+	diff			: Integer;
+	adjustedDate	: Date;
+begin
+	if date.day < self.startDate.day then
+		totalMonths := ((date.year - self.startDate.year) * 12) + (date.month - self.startDate.month);
+	else
+		totalMonths := ((date.year - self.startDate.year) * 12) + (date.month - self.startDate.month);
+	endif;
+	
+	
+	modulus := totalMonths mod self.period;
+	diff := self.period - modulus;
+	
+	if date.month + diff > 12 then
+		diff := diff - (12 - date.month);
+		adjustedDate.setDate(self.startDate.day, diff, date.year + 1);
+	else
+		adjustedDate.setDate(self.startDate.day, date.month + diff, date.year);
+	endif;
+	
+	return adjustedDate;
+end;
+
+}
+
+nextWeeklyValue
+{
+nextWeeklyValue(date: Date): Date;
+
+vars
+	totalDays		: Integer;
+	modulus			: Integer;
+	diff			: Integer;
+	adjustedDate	: Date;
+begin
+
+	totalDays := date.Integer - self.startDate.Integer;
+	modulus := totalDays mod (7 * period);
+	diff := (7 * period) - modulus;
+	adjustedDate := (date.Integer + diff).Date;
+	
+	return adjustedDate;
+end;
+
+}
+
+nextYearlyValue
+{
+nextYearlyValue(date: Date): Date;
+
+vars
+	totalYears		: Integer;
+	modulus			: Integer;
+	diff			: Integer;
+	adjustedDate	: Date;
+begin
+
+	totalYears := self.startDate.year - date.year;
+	modulus := totalYears mod self.period;
+	diff := self.period - modulus;
+	
+	if date.month < self.startDate.month then
+		adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + diff);
+	elseif date.month = self.startDate.month then
+		if date.day < self.startDate.day then
+			adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + diff);
+		else
+			adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + diff + 1);
+		endif;
+	else
+		adjustedDate.setDate(self.startDate.day, self.startDate.month, date.year + diff + 1);
+	endif;
+	
+	return adjustedDate;
 end;
 
 }
