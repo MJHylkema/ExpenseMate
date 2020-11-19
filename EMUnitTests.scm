@@ -65,7 +65,7 @@ typeDefinitions
 		repeatingOccurrence_daily_5() unitTest, number = 1002;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:23:24:52.964;
 		repeatingOccurrence_monthly_1() unitTest, number = 1005;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:23:42:59.423;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:11:13:01:48:39.189;
 		repeatingOccurrence_monthly_3() unitTest, number = 1006;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:23:51:37.901;
 		repeatingOccurrence_weekly_1() unitTest, number = 1003;
@@ -183,10 +183,15 @@ begin
 	startDate.setDate(9,10,1994);
 	adjuster := create RepeatingOccurrenceAdjuster(startDate, RepeatingOccurrenceAdjuster.Monthly, 1) transient;
 
-	// Regular case
+	// Regular case - before day of month
 	date.setDate(4,2,2000);
 	adjustedDate := date.with(adjuster);
 	assertEquals(Date@createDate(9,2,2000), adjustedDate);
+	
+	// Regular case - after day of month
+	date.setDate(12,2,2000);
+	adjustedDate := date.with(adjuster);
+	assertEquals(Date@createDate(9,3,2000), adjustedDate);
 	
 	// Periodic date case
 	date.setDate(9,2,2000);

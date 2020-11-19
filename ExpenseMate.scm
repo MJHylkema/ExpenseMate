@@ -247,7 +247,7 @@ typeDefinitions
 		nextDailyValue(date: Date): Date number = 1005;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:37:00.013;
 		nextMonthlyValue(date: Date): Date number = 1003;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:23:51:29.907;
+		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:11:13:01:59:08.453;
 		nextWeeklyValue(date: Date): Date number = 1004;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:32:48.750;
 		nextYearlyValue(date: Date): Date number = 1006;
@@ -687,11 +687,8 @@ vars
 	diff			: Integer;
 	adjustedDate	: Date;
 begin
-	if date.day < self.startDate.day then
-		totalMonths := ((date.year - self.startDate.year) * 12) + (date.month - self.startDate.month);
-	else
-		totalMonths := ((date.year - self.startDate.year) * 12) + (date.month - self.startDate.month);
-	endif;
+
+	totalMonths := ((date.year - self.startDate.year) * 12) + (date.month - self.startDate.month);
 	
 	
 	modulus := totalMonths mod self.period;
@@ -701,7 +698,11 @@ begin
 		diff := diff - (12 - date.month);
 		adjustedDate.setDate(self.startDate.day, diff, date.year + 1);
 	else
-		adjustedDate.setDate(self.startDate.day, date.month + diff, date.year);
+		if date.day < self.startDate.day then
+			adjustedDate.setDate(self.startDate.day, date.month + diff - 1, date.year);
+		else
+			adjustedDate.setDate(self.startDate.day, date.month + diff, date.year);
+		endif;
 	endif;
 	
 	return adjustedDate;
