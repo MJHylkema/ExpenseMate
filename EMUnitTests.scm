@@ -1,4 +1,4 @@
-jadeVersionNumber "18.0.01";
+jadeVersionNumber "20.0.01";
 schemaDefinition
 EMUnitTests subschemaOf ExpenseMate completeDefinition, patchVersioningEnabled = false;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:56:44.846;
@@ -8,7 +8,7 @@ localeDefinitions
 	5129 "English (New Zealand)" schemaDefaultLocale;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:56:44.808;
 	2057 "English (United Kingdom)" _cloneOf 5129;
-		setModifiedTimeStamp "<unknown>" "" 2020:10:27:20:41:24;
+		setModifiedTimeStamp "<unknown>" "" 2020:11:22:22:32:11;
 libraryDefinitions
 typeHeaders
 	EMUnitTests subclassOf ExpenseMate transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2070;
@@ -16,7 +16,6 @@ typeHeaders
 	AdjustersTestSuite subclassOf JadeTestCase number = 2072;
 	SEMUnitTests subclassOf SExpenseMate transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2073;
  
-interfaceDefs
 membershipDefinitions
  
 typeDefinitions
@@ -67,7 +66,7 @@ typeDefinitions
 		repeatingOccurrence_monthly_1() unitTest, number = 1005;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:11:13:01:48:39.189;
 		repeatingOccurrence_monthly_3() unitTest, number = 1006;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:23:51:37.901;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:11:22:23:04:14.727;
 		repeatingOccurrence_weekly_1() unitTest, number = 1003;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:23:25:50.416;
 		repeatingOccurrence_weekly_5() unitTest, number = 1004;
@@ -95,7 +94,7 @@ EMUnitTestsDb
 	(
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:56:44.846;
 	databaseFileDefinitions
-		"emunittests" number=52;
+		"emunittests" number = 52;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:56:44.846;
 	defaultFileDefinition "emunittests";
 	classMapDefinitions
@@ -225,22 +224,37 @@ vars
 	adjustedDate	: Date;
 begin
 	startDate.setDate(9,10,1994);
-	adjuster := create RepeatingOccurrenceAdjuster(startDate, RepeatingOccurrenceAdjuster.Monthly, 1) transient;
+	adjuster := create RepeatingOccurrenceAdjuster(startDate, RepeatingOccurrenceAdjuster.Monthly, 3) transient;
 
-	// Regular case
-	date.setDate(4,2,2000);
+	// Regular case - before day of month - same month
+	date.setDate(10,1,1995);
 	adjustedDate := date.with(adjuster);
-	assertEquals(Date@createDate(9,2,2000), adjustedDate);
+	assertEquals(Date@createDate(9,4,1995), adjustedDate);
+	
+	// Regular case - after day of month - same month
+	date.setDate(1,1,1995);
+	adjustedDate := date.with(adjuster);
+	assertEquals(Date@createDate(9,1,1995), adjustedDate);
+
+	// Regular case - before day of month
+	date.setDate(5,12,1994);
+	adjustedDate := date.with(adjuster);
+	assertEquals(Date@createDate(9,1,1995), adjustedDate);
+	
+	// Regular case - after day of month - same month
+	date.setDate(15,12,1994);
+	adjustedDate := date.with(adjuster);
+	assertEquals(Date@createDate(9,1,1995), adjustedDate);
 	
 	// Periodic date case
-	date.setDate(9,2,2000);
+	date.setDate(9,1,1995);
 	adjustedDate := date.with(adjuster);
-	assertEquals(Date@createDate(9,3,2000), adjustedDate);
+	assertEquals(Date@createDate(9,4,1995), adjustedDate);
 	
 	// Same date case
 	date.setDate(9,10,1994);
 	adjustedDate := date.with(adjuster);
-	assertEquals(Date@createDate(9,11,1994), adjustedDate);
+	assertEquals(Date@createDate(9,1,1995), adjustedDate);
 	
 	// Earlier date case
 	date.setDate(1,1,1990);	

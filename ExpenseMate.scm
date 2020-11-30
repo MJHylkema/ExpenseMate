@@ -1,4 +1,4 @@
-jadeVersionNumber "18.0.01";
+jadeVersionNumber "20.0.01";
 schemaDefinition
 ExpenseMate subschemaOf RootSchema completeDefinition, patchVersioningEnabled = false;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.311;
@@ -8,7 +8,7 @@ localeDefinitions
 	2057 "English (United Kingdom)" schemaDefaultLocale;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.294;
 	5129 "English (New Zealand)" _cloneOf 2057;
-		setModifiedTimeStamp "<unknown>" "" 2020:10:27:20:41:13;
+		setModifiedTimeStamp "<unknown>" "" 2020:11:22:22:31:56;
 libraryDefinitions
 typeHeaders
 	ExpenseMate subclassOf RootSchemaApp transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2048;
@@ -247,7 +247,7 @@ typeDefinitions
 		nextDailyValue(date: Date): Date number = 1005;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:37:00.013;
 		nextMonthlyValue(date: Date): Date number = 1003;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:11:13:01:59:08.453;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:11:22:23:05:25.553;
 		nextWeeklyValue(date: Date): Date number = 1004;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:32:48.750;
 		nextYearlyValue(date: Date): Date number = 1006;
@@ -305,7 +305,7 @@ ExpenseMateDb
 	(
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.311;
 	databaseFileDefinitions
-		"expensemate" number=51;
+		"expensemate" number = 51;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.311;
 	defaultFileDefinition "expensemate";
 	classMapDefinitions
@@ -690,19 +690,18 @@ begin
 
 	totalMonths := ((date.year - self.startDate.year) * 12) + (date.month - self.startDate.month);
 	
-	
 	modulus := totalMonths mod self.period;
 	diff := self.period - modulus;
+	
+	if date.day < self.startDate.day and modulus = null then
+		diff := diff - self.period;
+	endif;
 	
 	if date.month + diff > 12 then
 		diff := diff - (12 - date.month);
 		adjustedDate.setDate(self.startDate.day, diff, date.year + 1);
 	else
-		if date.day < self.startDate.day then
-			adjustedDate.setDate(self.startDate.day, date.month + diff - 1, date.year);
-		else
-			adjustedDate.setDate(self.startDate.day, date.month + diff, date.year);
-		endif;
+		adjustedDate.setDate(self.startDate.day, date.month + diff, date.year);
 	endif;
 	
 	return adjustedDate;
