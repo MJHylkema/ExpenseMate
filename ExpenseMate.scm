@@ -1,6 +1,13 @@
 jadeVersionNumber "20.0.01";
 schemaDefinition
 ExpenseMate subschemaOf RootSchema completeDefinition, patchVersioningEnabled = false;
+	documentationText
+`Each User has zero or more Account
+Each Account has one or more owning Users
+Each Account can have zero or more ReoccurringExpenses assigned to it
+Each Account can have zero or more ReoccurringDeposits assigned to it
+Each ReoccurringDeposit has one owner
+Each ReoccurringDeposit can have one or more ReoccurringExpenses assigned to it`
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.311;
 importedPackageDefinitions
 constantDefinitions
@@ -8,24 +15,25 @@ localeDefinitions
 	2057 "English (United Kingdom)" schemaDefaultLocale;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.294;
 	5129 "English (New Zealand)" _cloneOf 2057;
-		setModifiedTimeStamp "<unknown>" "" 2020:11:22:22:31:56;
+		setModifiedTimeStamp "<unknown>" "" 2020:11:30:23:19:26;
 libraryDefinitions
 typeHeaders
-	ExpenseMate subclassOf RootSchemaApp transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2048;
+	ExpenseMate subclassOf RootSchemaApp transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, highestOrdinal = 1, number = 2048;
 	Data subclassOf Object number = 2051;
-	Account subclassOf Data highestOrdinal = 1, number = 2052;
-	Event subclassOf Data highestOrdinal = 2, number = 2058;
-	ReoccurringDeposit subclassOf Event highestSubId = 1, highestOrdinal = 2, number = 2113;
-	ReoccurringExpense subclassOf Event highestOrdinal = 3, number = 2114;
-	EventOccurrence subclassOf Data highestOrdinal = 2, number = 2115;
+	Account subclassOf Data highestSubId = 1, highestOrdinal = 2, number = 2052;
+	ReoccurringEvent subclassOf Data abstract, highestOrdinal = 5, number = 2058;
+	ReoccurringDeposit subclassOf ReoccurringEvent highestSubId = 1, highestOrdinal = 2, number = 2113;
+	ReoccurringExpense subclassOf ReoccurringEvent highestOrdinal = 4, number = 2114;
 	Transaction subclassOf Data number = 2062;
-	User subclassOf Data number = 2053;
-	GExpenseMate subclassOf RootSchemaGlobal transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2049;
-	TemporalAdjuster subclassOf Object abstract, number = 2050;
-	RepeatingOccurrenceAdjuster subclassOf TemporalAdjuster highestOrdinal = 3, number = 2063;
+	User subclassOf Data highestSubId = 1, highestOrdinal = 4, number = 2053;
+	GExpenseMate subclassOf RootSchemaGlobal transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, highestOrdinal = 1, number = 2049;
+	TemporalAdjuster subclassOf Object abstract, highestOrdinal = 1, number = 2050;
+	RepeatingOccurrenceAdjuster subclassOf TemporalAdjuster highestOrdinal = 4, number = 2063;
 	SExpenseMate subclassOf RootSchemaSession transient, sharedTransientAllowed, transientAllowed, subclassSharedTransientAllowed, subclassTransientAllowed, number = 2065;
+	AccountSet subclassOf ObjectSet loadFactor = 66, number = 2057;
 	EventSet subclassOf ObjectSet loadFactor = 66, number = 2067;
 	ExpenseSet subclassOf EventSet loadFactor = 66, number = 2069;
+	UserSet subclassOf ObjectSet loadFactor = 66, number = 2059;
  
 interfaceDefs
 	TemporalAdjusterIF number = 1281
@@ -46,8 +54,10 @@ e.g.
 	)
  
 membershipDefinitions
-	EventSet of Event ;
+	AccountSet of Account ;
+	EventSet of ReoccurringEvent ;
 	ExpenseSet of ReoccurringExpense ;
+	UserSet of User ;
  
 typeDefinitions
 	Object completeDefinition
@@ -61,7 +71,7 @@ typeDefinitions
 	)
 	ExpenseMate completeDefinition
 	(
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.310;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:03:21:59:05.911;
 	)
 	Data completeDefinition
 	(
@@ -73,26 +83,27 @@ typeDefinitions
 	attributeDefinitions
 		id:                            Integer protected, number = 1, ordinal = 1;
 		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:16:18.390;
+	referenceDefinitions
+		owners:                        UserSet   explicitInverse, protected, subId = 1, number = 2, ordinal = 2;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:54:57.208;
 	)
-	Event completeDefinition
+	ReoccurringEvent completeDefinition
 	(
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:58:13.932;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:23:03:22.546;
 	attributeDefinitions
 		startDate:                     Date protected, number = 2, ordinal = 2;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:20:47:01.432;
 	referenceDefinitions
-		occurrence:                    EventOccurrence  protected, number = 1, ordinal = 1;
-		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:56:48.002;
+		temporalAdjuster:              TemporalAdjuster   explicitEmbeddedInverse, protected, number = 1, ordinal = 5;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:18:03.680;
  
 	jadeMethodDefinitions
-		create(
-			startDate: Date; 
-			occurrence: EventOccurrence) updating, number = 1001;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:20:53:54.567;
+		create(startDate: Date) updating, number = 1001;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:12:30.849;
 		nextOccurrence(): Date number = 1003;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:14:36.228;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:28:19.219;
 		nextOccurrenceFrom(fromDate: Date): Date number = 1002;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:14:48.155;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:28:15.104;
 	)
 	ReoccurringDeposit completeDefinition
 	(
@@ -106,16 +117,17 @@ typeDefinitions
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:00:55.476;
 		create(
 			startDate: Date; 
-			occurrence: EventOccurrence) updating, number = 1002;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:27:58.757;
+			unit: Integer; 
+			period: Integer) updating, number = 1002;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:18:44.214;
 		delete() updating, number = 1004;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:06:04.838;
 		reportNextOccurrence() number = 1003;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:17:22.110;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:22:32.265;
 	)
 	ReoccurringExpense completeDefinition
 	(
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:11:17.485;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:17:42.607;
 	attributeDefinitions
 		cost:                          Decimal[12] readonly, number = 3, ordinal = 3;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:03:35.193;
@@ -127,45 +139,12 @@ typeDefinitions
  
 	jadeMethodDefinitions
 		create(
+			startDate: Date; 
 			name: String; 
-			startDate: Date; 
-			occurrence: EventOccurrence; 
+			unit: Integer; 
+			period: Integer; 
 			cost: Decimal) updating, number = 1001;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:17:41.304;
-	)
-	EventOccurrence completeDefinition
-	(
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:44:40.012;
-	constantDefinitions
-		Daily:                         Integer = 0 number = 1001;
-		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:57:05.729;
-		Monthly:                       Integer = 2 number = 1003;
-		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:57:14.601;
-		Weekly:                        Integer = 1 number = 1002;
-		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:57:10.237;
-		Yearly:                        Integer = 3 number = 1004;
-		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:57:19.362;
-	attributeDefinitions
-		period:                        Integer protected, number = 2, ordinal = 2;
-		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:54:53.880;
-		timeUnit:                      Integer protected, number = 1, ordinal = 1;
-		setModifiedTimeStamp "user" "18.0.01" 2020:10:20:23:53:40.742;
- 
-	jadeMethodDefinitions
-		create(
-			period: Integer; 
-			unit: Integer) updating, number = 1002;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:21:29.681;
-		createOccurrence(
-			period: Integer; 
-			unit: Integer): EventOccurrence typeMethod, number = 1001;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:23:35.900;
-		nextOccurrence(
-			startDate: Date; 
-			fromDate: Date): Date number = 1003;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:21:52:23.999;
-		reportOccurrence(): String number = 1004;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:02:41.711;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:18:21.193;
 	)
 	Transaction completeDefinition
 	(
@@ -173,7 +152,29 @@ typeDefinitions
 	)
 	User completeDefinition
 	(
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:28:20.737;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:23:03:47.291;
+	attributeDefinitions
+		firstName:                     String[31] protected, number = 1, ordinal = 1;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:44:48.318;
+		lastName:                      String[31] protected, number = 2, ordinal = 2;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:44:55.816;
+		name:                          String[62] readonly, virtual, number = 3, ordinal = 3;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:45:13.016;
+	referenceDefinitions
+		accounts:                      AccountSet   explicitInverse, protected, subId = 1, number = 4, ordinal = 4;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:54:57.204;
+ 
+	jadeMethodDefinitions
+		addAccount(account: Account) number = 1003;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:23:05:18.889;
+		create(
+			firstName: String; 
+			lastName: String) updating, number = 1002;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:46:44.124;
+		name(
+			set: Boolean; 
+			_value: String io) mapping, number = 1001;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:23:05:28.991;
 	)
 	Global completeDefinition
 	(
@@ -183,14 +184,14 @@ typeDefinitions
 	)
 	GExpenseMate completeDefinition
 	(
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:09:28:21:15:10.311;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:03:21:59:00.928;
 	)
 	JadeScript completeDefinition
 	(
  
 	jadeMethodDefinitions
 		monthyDepositExample() number = 1001;
-		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:44:47.868;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:48:57.349;
 	)
 	JadeTestCase completeDefinition
 	(
@@ -199,6 +200,9 @@ typeDefinitions
 	TemporalAdjuster completeDefinition
 	(
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:29:25.194;
+	referenceDefinitions
+		owningEvent:                   ReoccurringEvent   explicitEmbeddedInverse, protected, number = 1, ordinal = 1;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:18:03.696;
  
 	jadeMethodDefinitions
 		adjustInto(date: Date): Date abstract, number = 1001;
@@ -235,6 +239,9 @@ typeDefinitions
  - Yearly`
 
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:16:59:21.057;
+	referenceDefinitions
+		event:                         ReoccurringExpense  protected, number = 4, ordinal = 4;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:13:08.638;
  
 	jadeMethodDefinitions
 		adjustInto(date: Date): Date number = 1001;
@@ -244,6 +251,11 @@ typeDefinitions
 			unit: Integer; 
 			period: Integer) updating, number = 1002;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:26:22:58:18.021;
+		createAdjuster(
+			startDate: Date; 
+			unit: Integer; 
+			period: Integer): RepeatingOccurrenceAdjuster typeMethod, number = 1007;
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:01:00:24:24.842;
 		nextDailyValue(date: Date): Date number = 1005;
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:27:22:37:00.013;
 		nextMonthlyValue(date: Date): Date number = 1003;
@@ -276,6 +288,10 @@ typeDefinitions
 	ObjectSet completeDefinition
 	(
 	)
+	AccountSet completeDefinition
+	(
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:53:49.457;
+	)
 	EventSet completeDefinition
 	(
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:20:55:08.250;
@@ -283,6 +299,10 @@ typeDefinitions
 	ExpenseSet completeDefinition
 	(
 		setModifiedTimeStamp "mjhylkema" "18.0.01" 2020:10:22:22:04:18.325;
+	)
+	UserSet completeDefinition
+	(
+		setModifiedTimeStamp "mjhylkema" "20.0.01" 2020:12:05:22:54:10.202;
 	)
 	Date completeDefinition
 	(
@@ -299,6 +319,8 @@ typeDefinitions
  
  
 inverseDefinitions
+	accounts of User manual peerOf owners of Account automatic;
+	temporalAdjuster of ReoccurringEvent parentOf owningEvent of TemporalAdjuster;
 	deposit of ReoccurringExpense peerOf expenses of ReoccurringDeposit;
 databaseDefinitions
 ExpenseMateDb
@@ -315,28 +337,28 @@ ExpenseMateDb
 		Data in "expensemate";
 		Account in "expensemate";
 		User in "expensemate";
-		Event in "expensemate";
+		ReoccurringEvent in "expensemate";
 		Transaction in "expensemate";
 		ReoccurringDeposit in "expensemate";
 		ReoccurringExpense in "expensemate";
-		EventOccurrence in "expensemate";
 		EventSet in "expensemate";
 		ExpenseSet in "expensemate";
 		TemporalAdjuster in "expensemate";
 		RepeatingOccurrenceAdjuster in "expensemate";
+		AccountSet in "expensemate";
+		UserSet in "expensemate";
 	)
 schemaViewDefinitions
 exportedPackageDefinitions
 typeSources
-	Event (
+	ReoccurringEvent (
 	jadeMethodSources
 create
 {
-create(startDate: Date; occurrence: EventOccurrence) updating;
+create(startDate: Date) updating;
 
 begin
 	self.startDate := startDate;
-	self.occurrence := occurrence;
 end;
 
 }
@@ -344,8 +366,6 @@ end;
 nextOccurrence
 {
 nextOccurrence(): Date;
-
-vars
 
 begin
 	return self.nextOccurrenceFrom(app.getUTCTime.date);
@@ -357,10 +377,8 @@ nextOccurrenceFrom
 {
 nextOccurrenceFrom(fromDate: Date): Date;
 
-vars
-	nextDate: Date;
 begin
-	return self.occurrence.nextOccurrence(self.startDate, fromDate);
+	return fromDate.with(self.temporalAdjuster);
 end;
 
 }
@@ -380,10 +398,10 @@ end;
 
 create
 {
-create(startDate: Date; occurrence: EventOccurrence)::super(startDate, occurrence) updating;
+create(startDate: Date; unit: Integer; period: Integer)::super(startDate) updating;
 
 begin
-
+	self.temporalAdjuster := RepeatingOccurrenceAdjuster@createAdjuster(startDate, unit, period);
 end;
 
 }
@@ -409,11 +427,10 @@ vars
 	date, nextDeposit, followingDeposit: Date;
 	totalExpenses: Decimal[12,2];
 begin
-	date.setDate(21,10,2020);
-	nextDeposit := self.nextOccurrenceFrom(date);
+	nextDeposit := self.nextOccurrence();
 	followingDeposit := self.nextOccurrenceFrom(nextDeposit);
 	
-	write "Next deposit - " & nextDeposit.display() & " (" & self.occurrence.reportOccurrence & " period ends " & followingDeposit.display() & ") covers the following expenses:";
+	write "Next deposit - " & nextDeposit.display() & " (period ends " & followingDeposit.display() & ") covers the following expenses:";
 	
 	foreach expense in self.expenses do
 		date := expense.nextOccurrenceFrom(nextDeposit);
@@ -439,106 +456,47 @@ end;
 	jadeMethodSources
 create
 {
-create(name: String; startDate: Date; occurrence: EventOccurrence; cost: Decimal)::super(startDate, occurrence) updating;
+create(startDate: Date; name: String; unit: Integer; period: Integer; cost: Decimal)::super(startDate) updating;
 
 begin
 	self.name := name;
 	self.cost := cost;
+	self.temporalAdjuster := RepeatingOccurrenceAdjuster@createAdjuster(startDate, unit, period);
 end;
 
 }
 
 	)
-	EventOccurrence (
+	User (
 	jadeMethodSources
+addAccount
+{
+addAccount(account: Account);
+
+begin
+	accounts.tryAdd(account);
+end;
+
+}
+
 create
 {
-create(period: Integer; unit: Integer) updating;
+create(firstName, lastName: String) updating;
 
 begin
-	self.period := period;
-	self.timeUnit := unit;
+	self.firstName := firstName;
+	self.lastName := lastName;
 end;
 
 }
 
-createOccurrence
+name
 {
-createOccurrence(period: Integer; unit: Integer): EventOccurrence typeMethod;
-
-vars
-	occurrence: EventOccurrence;
-begin
-	if unit > Yearly or period < 1 then
-		return null;
-	endif;
-	
-	occurrence := create EventOccurrence(period, unit) transient;
-	
-	return occurrence;
-end;
-
-}
-
-nextOccurrence
-{
-nextOccurrence(startDate: Date; fromDate: Date): Date;
-
-vars
-	nextDate: Date;
-begin
-	nextDate := startDate;
-
-	if self.timeUnit = Daily then
-	
-		while nextDate < fromDate do
-			nextDate := nextDate + 1;
-		endwhile;
-		
-	elseif self.timeUnit = Weekly then
-	
-		while nextDate <= fromDate do
-			nextDate := nextDate + 7;
-		endwhile;
-		
-	elseif self.timeUnit = Monthly then
-	
-		while nextDate <= fromDate do
-			if nextDate.month() < 12 then
-				nextDate.setDate(nextDate.day(), nextDate.month() + 1, nextDate.year());
-			else
-				nextDate.setDate(nextDate.day(), 01 /* January */, nextDate.year() + 1);
-			endif;
-		endwhile;
-		
-	elseif self.timeUnit = Yearly then
-	
-		while nextDate <= fromDate do
-			nextDate.setDate(nextDate.day(), nextDate.month(), nextDate.year() + 1);
-		endwhile;
-		
-	endif;
-	
-	return nextDate;
-end;
-
-}
-
-reportOccurrence
-{
-reportOccurrence(): String;
-
-vars
+name(set: Boolean; _value: String io) mapping;
 
 begin
-	if self.timeUnit = Daily then
-		return EventOccurrence::Daily.getName;
-	elseif self.timeUnit = Weekly then
-		return EventOccurrence::Weekly.getName;
-	elseif self.timeUnit = Monthly then
-		return EventOccurrence::Monthly.getName;
-	elseif self.timeUnit = Yearly then
-		return EventOccurrence::Yearly.getName;
+	if not set then
+		_value := firstName & " " & lastName;
 	endif;
 end;
 
@@ -553,32 +511,26 @@ monthyDepositExample();
 
 vars
 	date: Date;
-	occurrence: EventOccurrence;
 	expense: ReoccurringExpense;
 	monthlyDeposit: ReoccurringDeposit;
 begin
 	date := Date@createDate(22,10,2020);
-	occurrence := EventOccurrence@createOccurrence(1, EventOccurrence.Monthly);
-	monthlyDeposit := create ReoccurringDeposit(date, occurrence) transient;
+	monthlyDeposit := create ReoccurringDeposit(date, RepeatingOccurrenceAdjuster.Monthly, 1) transient;
 	
 	date := Date@createDate(27,10,2020);
-	occurrence := EventOccurrence@createOccurrence(1, EventOccurrence.Weekly);
-	expense := create ReoccurringExpense("Rent", date, occurrence, 200.00) transient;
+	expense := create ReoccurringExpense(date, "Rent", RepeatingOccurrenceAdjuster.Weekly, 1, 200.00) transient;
 	monthlyDeposit.addExpense(expense);
 	
 	date := Date@createDate(24,10,2020);
-	occurrence := EventOccurrence@createOccurrence(1, EventOccurrence.Weekly);
-	expense := create ReoccurringExpense("Grocceries", date, occurrence, 100.00) transient;
+	expense := create ReoccurringExpense(date, "Grocceries", RepeatingOccurrenceAdjuster.Weekly, 1, 100.00) transient;
 	monthlyDeposit.addExpense(expense);
 	
 	date := Date@createDate(12,11,2020);
-	occurrence := EventOccurrence@createOccurrence(1, EventOccurrence.Monthly);
-	expense := create ReoccurringExpense("Internet", date, occurrence, 74.95) transient;
+	expense := create ReoccurringExpense(date, "Internet", RepeatingOccurrenceAdjuster.Monthly, 1, 74.95) transient;
 	monthlyDeposit.addExpense(expense);
 	
 	date := Date@createDate(13,11,2020);
-	occurrence := EventOccurrence@createOccurrence(1, EventOccurrence.Monthly);
-	expense := create ReoccurringExpense("Power", date, occurrence, 80.00) transient;
+	expense := create ReoccurringExpense(date, "Power", RepeatingOccurrenceAdjuster.Monthly, 1, 80.00) transient;
 	monthlyDeposit.addExpense(expense);
 		
 	monthlyDeposit.reportNextOccurrence();
@@ -645,6 +597,19 @@ begin
 	self.startDate := startDate;
 	self.unit := unit;
 	self.period := period;
+end;
+
+}
+
+createAdjuster
+{
+createAdjuster(startDate: Date; unit, period: Integer): RepeatingOccurrenceAdjuster typeMethod;
+
+vars
+	adjuster: RepeatingOccurrenceAdjuster;
+begin
+	adjuster := create RepeatingOccurrenceAdjuster(startDate, unit, period) transient;
+	return adjuster;
 end;
 
 }
