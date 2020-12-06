@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<schema name="ExpenseMate" JadeVersionNumber="20.0.01" JadePatchNumber="0" CompleteDefinition="true">
+<schema name="EMUnitTests" JadeVersionNumber="20.0.01" JadePatchNumber="0" CompleteDefinition="true">
 
-	<Application name="ExpenseMate">
+	<Application name="EMUnitTests">
 		<__overridePatchNumber>0</__overridePatchNumber>
 		<__patchControlString/>
 		<_aboutFormName/>
 		<_defaultLocaleId>0</_defaultLocaleId>
 		<_modifiedBy>mjhylkema</_modifiedBy>
-		<_modifiedTimestamp>2020:09:28:21:15:10.314</_modifiedTimestamp>
+		<_modifiedTimestamp>2020:10:26:16:56:44.852</_modifiedTimestamp>
 		<_patchVersion>0</_patchVersion>
 		<_startupFormName/>
 		<_systemVersion>18.0.01</_systemVersion>
@@ -28,7 +28,7 @@
 		<initializeMethod/>
 		<mdiStyle>0</mdiStyle>
 		<mdiWindowListOrder>0</mdiWindowListOrder>
-		<name>ExpenseMate</name>
+		<name>EMUnitTests</name>
 		<showBubbleHelp>false</showBubbleHelp>
 		<startupForm/>
 		<useBorderStyleOnly>false</useBorderStyleOnly>
@@ -40,6 +40,6 @@
 		</threeDControls>
 	</Application>
 
-	<Global name="GExpenseMate">
+	<Global name="GEMUnitTests">
 	</Global>
 </schema>
